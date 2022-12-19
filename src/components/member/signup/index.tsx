@@ -89,13 +89,29 @@ const SignUp = () => {
   const [form, setForm] = useState({
     email: "",
     password: "",
+    passwordConfirm: "",
     companyName: "",
     classification: "",
     name: "",
     number: "",
   });
-  const { email, password, companyName, name, number, classification } = form;
-  const values = [email, password, companyName, name, number, classification];
+  const {
+    email,
+    password,
+    passwordConfirm,
+    companyName,
+    name,
+    number,
+    classification,
+  } = form;
+  const values = [
+    password,
+    passwordConfirm,
+    companyName,
+    name,
+    number,
+    classification,
+  ];
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // if (formValidater(form, isEmailValid)) {
@@ -187,7 +203,7 @@ const SignUp = () => {
               name={name}
               className="input"
               type={type}
-              value={values[id]}
+              value={values[id - 1]}
               placeholder={placeholder}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const { name, value } = e.target;
