@@ -105,7 +105,7 @@ export const reset = css`
   }
   body {
     line-height: 1;
-    font-family: "Quicksand", sans-serif;
+    font-family: "Nanum Gothic", sans-serif;
   }
   ol,
   ul {
