@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 
 const FormContainer = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 300px;
@@ -16,7 +17,7 @@ const Input = styled.div`
   flex-direction: column;
   align-items: flex-start;
   width: inherit;
-  margin-bottom: 5px;
+  margin-bottom: 7px;
   .input {
     width: inherit;
     height: 35px;

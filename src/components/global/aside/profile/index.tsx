@@ -1,17 +1,17 @@
 import styled from "@emotion/styled";
+import { useEffect, useState } from "react";
 import {
   MdRecentActors,
   MdOutlineConstruction,
   MdAssignment,
 } from "react-icons/md";
+import useApi from "../../../../hooks/api/axiosInterceptor";
+import { IUserType } from "../../../../interface/userInterface";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 10px;
-  background-color: white;
-  border-radius: 5px;
   .header {
     display: flex;
     justify-content: flex-start;
@@ -38,22 +38,34 @@ const Container = styled.div`
   }
 `;
 
-const userInfo = {
-  name: "김태훈",
-  company: "설곽건설",
-  classification: "건설사",
-  assignedProject: 3,
-};
-
-const Profile = () => {
-  // call the user information using the access token [fetch]
-  const { name, company, classification, assignedProject } = userInfo;
+const Profile = ({ userId }: { userId: number }) => {
+  const [userInfo, setUserInfo] = useState<IUserType>();
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data, status } = await useApi.get("/crew/one", {
+          params: { crewId: userId },
+        });
+        if (status === 200) {
+          setUserInfo(data);
+        }
+      } catch (err: any) {
+        console.log(err);
+      }
+    })();
+  }, []);
+  if (!userInfo) return null;
+  const {
+    name,
+    classification,
+    companyInfo: { companyName },
+  } = userInfo;
   return (
     <Container>
       <div className="header">
         <MdRecentActors size={25} />
         <span>
-          {company} {name}님
+          {companyName} {name}님
         </span>
       </div>
       <ul className="info_list">
@@ -63,7 +75,7 @@ const Profile = () => {
         </li>
         <li>
           <MdAssignment size={25} />
-          <span>{assignedProject}개의 프로젝트 등록</span>
+          <span>{20}개의 프로젝트 등록</span>
         </li>
       </ul>
     </Container>

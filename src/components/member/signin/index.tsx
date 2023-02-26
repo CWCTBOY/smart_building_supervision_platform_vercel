@@ -1,7 +1,9 @@
 import styled from "@emotion/styled";
-import { useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import { MdPersonOutline, MdLockOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import useApi from "../../../hooks/api/axiosInterceptor";
+import { isSessionPresent } from "../../../hooks/signHooks";
 import { signinForm } from "../data";
 
 const SignInForm = styled.form`
@@ -72,13 +74,31 @@ const SignIn = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const { email, password } = form;
   const values = [email, password];
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(form);
-    localStorage.setItem("access_token", "1234");
-    alert("로그인 성공");
-    window.location.href = "/project";
+    try {
+      const { status } = await useApi.post("/auth/sign-in", form);
+      if (status === 200) {
+        alert("환영합니다.");
+        window.location.href = "/project";
+      }
+    } catch (error: any) {
+      const { status } = error.response;
+      if (status === 404) {
+        alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+        setForm({ email: "", password: "" });
+      }
+      if (status === 403) {
+        alert(`관리자에게 승인되지 않은 계정입니다.
+        허가를 받을 때까지 로그인이 불가능합니다.`);
+      }
+    }
   };
+  useEffect(() => {
+    (async () => {
+      await isSessionPresent();
+    })();
+  }, []);
   return (
     <SignInForm onSubmit={handleSubmit}>
       {signinForm.map(({ id, name, placeholder, type }) => (

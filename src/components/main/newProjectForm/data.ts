@@ -1,6 +1,6 @@
 const addNewFormProperties = [
   {
-    name: "projectName",
+    name: "name",
     type: "text",
     placeholder: "프로젝트명",
   },
@@ -15,23 +15,13 @@ const addNewFormProperties = [
     placeholder: "종료일",
   },
   {
-    name: "email",
-    type: "email",
-    placeholder: "담당자 이메일",
-  },
-  {
-    name: "phone",
-    type: "tel",
-    placeholder: "담당자 연락처",
-  },
-  {
-    name: "classification",
+    name: "constructionClass",
     options: ["건축공사", "토목공사", "플랜트공사", "조경공사"],
     type: "select",
     placeholder: "공사구분",
   },
   {
-    name: "detailClassification",
+    name: "detailConstructionClass",
     options: [
       "주거용 건축물",
       "사무실용 건축물",

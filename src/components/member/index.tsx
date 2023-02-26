@@ -1,9 +1,8 @@
 import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import bg_img from "../../assets/member/signin_bg.avif";
 import logo from "../../assets/member/snust_main.png";
-import { tokenChecker } from "../../hooks/auth/token";
 
 const MemberContainer = styled.div`
   display: flex;
@@ -67,10 +66,6 @@ const Container = styled.div<{ pathname: string }>`
 const Member = () => {
   const { pathname } = useLocation();
   const [path, setPath] = useState(pathname);
-  const navigate = useNavigate();
-  useEffect(() => {
-    tokenChecker() && navigate("/project");
-  }, []);
   useEffect(() => {
     setPath(pathname);
   }, [pathname]);

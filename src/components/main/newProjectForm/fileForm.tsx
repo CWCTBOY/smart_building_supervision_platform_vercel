@@ -1,11 +1,11 @@
 import styled from "@emotion/styled";
-import { RefObject, useRef } from "react";
+import { ChangeEvent, RefObject, useRef } from "react";
 import {
-  MdOutlineImageSearch,
   MdOutlineImageNotSupported,
-  MdLayers,
   MdCheckCircleOutline,
 } from "react-icons/md";
+import { imgUploader } from "../../../hooks/projectHooks";
+import { IFileFormType } from "../../../interface/formInterface";
 
 const Container = styled.div`
   display: flex;
@@ -18,7 +18,7 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: space-between;
     width: inherit;
-    height: 330px;
+    height: 342px;
     margin-top: 17px;
     padding: 10px;
     border: 2px solid ${({ theme }) => theme.colors.gray};
@@ -34,9 +34,13 @@ const Container = styled.div`
       height: 230px;
       border-radius: 5px;
       background-color: ${({ theme }) => theme.colors.gray};
+      overflow: hidden;
       .no_img {
         font-size: ${({ theme }) => theme.fonts.size.large};
         color: rgba(0, 0, 0, 0.3);
+      }
+      .thumbnail {
+        width: 150%;
       }
     }
     .flex_box {
@@ -71,7 +75,13 @@ const Container = styled.div`
 
 /* <--> */
 
-const FileForm = () => {
+const FileForm = ({
+  fileForm,
+  setFileForm,
+}: {
+  fileForm: IFileFormType | null;
+  setFileForm: any;
+}) => {
   const floorPlanRef = useRef<HTMLInputElement>(null);
   const thumbnailRef = useRef<HTMLInputElement>(null);
   const onAssign = (ref: RefObject<HTMLInputElement>) => {
@@ -79,11 +89,22 @@ const FileForm = () => {
       ref.current.click();
     }
   };
+  const onChangeImg = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const file = e.target.files[0];
+    const thumbnail = await imgUploader(file);
+    if (!fileForm) return;
+    setFileForm({ ...fileForm, thumbnail });
+  };
   return (
     <Container>
       <div className="body">
         <div className="preview">
-          <MdOutlineImageNotSupported className="no_img" size={40} />
+          {fileForm?.thumbnail === null ? (
+            <MdOutlineImageNotSupported className="no_img" size={40} />
+          ) : (
+            <img className="thumbnail" src={fileForm?.thumbnail} alt="11" />
+          )}
         </div>
         <div className="flex_box">
           <button
@@ -93,13 +114,13 @@ const FileForm = () => {
               onAssign(thumbnailRef);
             }}
           >
-            <input type="file" ref={thumbnailRef} />
+            <input type="file" ref={thumbnailRef} onChange={onChangeImg} />
             <span className="btn_name">대표이미지 등록</span>
-            <span className="icon">
-              <MdOutlineImageSearch size={25} />
-            </span>
           </button>
-          <MdCheckCircleOutline size={25} />
+          <MdCheckCircleOutline
+            size={25}
+            color={fileForm?.thumbnail === null ? "#D0D0D0" : "#05A846"}
+          />
         </div>
         <div className="flex_box">
           <button
@@ -111,10 +132,12 @@ const FileForm = () => {
           >
             <input type="file" ref={floorPlanRef} />
             <span className="btn_name">평면도 등록</span>
-            <MdLayers size={25} />
           </button>
           <span className="icon">
-            <MdCheckCircleOutline size={25} />
+            <MdCheckCircleOutline
+              size={25}
+              color={fileForm?.floorPlan === null ? "#D0D0D0" : "#05A846"}
+            />
           </span>
         </div>
       </div>

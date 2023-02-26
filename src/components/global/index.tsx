@@ -1,22 +1,31 @@
 import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { tokenChecker } from "../../hooks/auth/token";
+import {
+  Outlet,
+  useLocation,
+  useNavigate,
+  useOutletContext,
+} from "react-router-dom";
+import useApi from "../../hooks/api/axiosInterceptor";
+import { ProjectClassType } from "../../interface/projectInterface";
+import { ISessionInfoType } from "../../interface/userInterface";
 import GlobalAside from "./aside";
+import GlobalHeader from "./header";
 
-const Container = styled.div<{ auth: boolean }>`
+const Container = styled.div<{ loc: boolean }>`
+  position: relative;
   display: flex;
-  align-items: center;
   width: 100vw;
   height: 100vh;
   background-color: ${({ theme }) => theme.colors.white};
   .outlet {
     display: flex;
-    justify-content: center;
-    width: ${({ auth }) => (auth ? "calc(100vw - 350px)" : "100vw")};
+    flex-direction: column;
+    justify-content: space-between;
+    width: calc(100vw - 350px);
     height: 100vh;
-    overflow: scroll;
-    padding: 20px;
+    overflow-y: scroll;
+    padding: ${({ loc }) => (loc ? "60px 0 0 0" : "80px 20px 20px 20px")};
   }
 `;
 
@@ -25,26 +34,66 @@ const Container = styled.div<{ auth: boolean }>`
 const GlobalContainer = () => {
   const loc = useLocation();
   const nav = useNavigate();
-  const [curLoc, setCurLoc] = useState(loc.pathname);
-  const [auth, setAuth] = useState(!tokenChecker());
+  const [sessionInfo, setSessionInfo] = useState<ISessionInfoType>();
+  const [projectInputName, setProjectInputName] = useState("");
+  const [projectCategory, setProjectCategory] = useState<ProjectClassType>({
+    constructionClass: "none",
+    detailConstructionClass: "none",
+  });
   useEffect(() => {
-    setAuth(tokenChecker());
-    setCurLoc(loc.pathname);
-  }, []);
-  useEffect(() => {
-    if (!tokenChecker() && curLoc !== "/member/signin") {
-      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-      window.location.href = "/member/signin";
-    }
-  }, [curLoc]);
+    (async () => {
+      try {
+        const { data, status } = await useApi.get<ISessionInfoType>(
+          "/session-info"
+        );
+        if (status === 200) {
+          setSessionInfo(data);
+        }
+      } catch (error: any) {
+        const { status } = error.response;
+        if (status === 401) {
+          alert("세션이 만료되었습니다.");
+          nav("/member/signin");
+        }
+        if (status === 403) {
+          alert("접근 권한이 없습니다.");
+          nav("/member/signin");
+        }
+        if (status === 404) {
+          alert("다시 로그인을 해주세요.");
+          nav("/member/signin");
+        }
+      }
+    })();
+  }, [loc.pathname]);
   return (
-    <Container auth={auth}>
-      <GlobalAside />
-      <div className="outlet">
-        <Outlet />
-      </div>
+    <Container loc={loc.pathname.includes("virtualtour")}>
+      {sessionInfo && (
+        <>
+          <GlobalAside sessionInfo={sessionInfo} />
+          <div className="outlet">
+            <GlobalHeader
+              setProjectInputName={setProjectInputName}
+              projectCategory={projectCategory}
+              setProjectCategory={setProjectCategory}
+            />
+            <Outlet
+              context={{ sessionInfo, projectInputName, projectCategory }}
+            />
+          </div>
+        </>
+      )}
     </Container>
   );
+};
+
+export const useOutletProps = (): any => {
+  const { sessionInfo, projectInputName, projectCategory } =
+    useOutletContext<any>();
+  if (!sessionInfo) {
+    throw new Error("useOutletContext must be used within a OutletContext");
+  }
+  return { sessionInfo, projectInputName, projectCategory };
 };
 
 export default GlobalContainer;

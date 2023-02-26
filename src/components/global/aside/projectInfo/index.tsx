@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import { useParams } from "react-router-dom";
-import four from "../../../../assets/dummyThumbnail/4.avif";
 
 const Container = styled.div`
   display: flex;
@@ -38,34 +37,34 @@ const Container = styled.div`
 `;
 
 const ProjectInfo = () => {
-  const data = {
-    id: 4,
-    projectName: "project D",
-    startDate: "2021-01-01",
-    endDate: "2021-01-01",
-    processRate: "50%",
-    thumbnail: four,
-    alert: {
-      newOne: 3,
-      emergency: 4,
-      question: 7,
-    },
-  };
-  const { projectName, startDate, endDate, thumbnail } = data;
+  //   const data = {
+  //     id: 4,
+  //     projectName: "project D",
+  //     startDate: "2021-01-01",
+  //     endDate: "2021-01-01",
+  //     processRate: "50%",
+  //     thumbnail: four,
+  //     alert: {
+  //       newOne: 3,
+  //       emergency: 4,
+  //       question: 7,
+  //     },
+  //   };
+  // const { projectName, startDate, endDate, thumbnail } = data;
 
   const { id } = useParams();
-
-  return (
-    <Container>
-      <div className="thumbnail_box">
-        <img src={thumbnail} alt={projectName} />
-      </div>
-      <span className="header">{projectName}</span>
-      <span className="period">
-        {startDate} ~ {endDate}
-      </span>
-    </Container>
-  );
+  return null;
+  // return (
+  //   <Container>
+  //     <div className="thumbnail_box">
+  //       <img src={thumbnail} alt={projectName} />
+  //     </div>
+  //     <span className="header">{projectName}</span>
+  //     <span className="period">
+  //       {startDate} ~ {endDate}
+  //     </span>
+  //   </Container>
+  // );
 };
 
 export default ProjectInfo;

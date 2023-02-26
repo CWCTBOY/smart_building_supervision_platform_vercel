@@ -2,18 +2,23 @@ import styled from "@emotion/styled";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signupForm } from "../data";
-import EmailValidater from "./emailValidater";
-import { formValidater } from "./validater";
-import { MdCheckCircleOutline } from "react-icons/md";
+import {
+  emailValidater,
+  codeValidater,
+  formValidater,
+  searchCompany,
+} from "../../../hooks/signHooks";
+import useApi from "../../../hooks/api/axiosInterceptor";
+import CompanyListModal from "./companyListModal";
+import { ICompanyType } from "../../../interface/userInterface";
 
-const passwordRegex =
-  "^(?=.*[A-Za-z])(?=.*d)(?=.*[$@$!%*#?&])[A-Za-zd$@$!%*#?&]{8,}$";
-
-const SignUpForm = styled.form`
+const SignUpForm = styled.form<{ isCompanyListModalOpen: boolean }>`
   display: flex;
   flex-direction: column;
-  align-items: center;
   width: 100%;
+  height: ${({ isCompanyListModalOpen }) =>
+    isCompanyListModalOpen ? "399px" : "100%"};
+  overflow: hidden;
 `;
 const Input = styled.div`
   display: flex;
@@ -83,54 +88,92 @@ const SubmitBtn = styled.button`
 
 const SignUp = () => {
   const nav = useNavigate();
+  const [isCodeInputOpen, setIsCodeInputOpen] = useState(false);
+  const [companyId, setCompanyId] = useState(0);
+  const [isCompanyListModalOpen, setIsCompanyListModalOpen] = useState(false);
+  const [companyList, setCompanyList] = useState<ICompanyType[]>();
+  const [companyName, setCompanyName] = useState("");
   const [code, setCode] = useState("");
-  const [isCodeSended, setIsCodeSended] = useState(false);
   const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isCodeValid, setIsCodeValid] = useState(false);
+  const [isCodeSended, setIsCodeSended] = useState(false);
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
     passwordConfirm: "",
-    companyName: "",
-    classification: "",
-    name: "",
     number: "",
+    classification: "",
   });
-  const {
-    email,
-    password,
-    passwordConfirm,
-    companyName,
-    name,
-    number,
-    classification,
-  } = form;
-  const values = [
-    password,
-    passwordConfirm,
-    companyName,
-    name,
-    number,
-    classification,
-  ];
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const { email, password, passwordConfirm, name, number, classification } =
+    form;
+  const values = [password, passwordConfirm, name, number, classification];
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // if (formValidater(form, isEmailValid)) {
-    //   alert("회원가입 성공!");
-    //   nav("/member/signin");
-    // }
-    console.log(form);
-  };
-  const codeSender = (email: string) => {
-    // 이메일 중복검사
-    // fetch code sender server
-    // if code is sended, set validater true
-    setIsCodeSended(true);
+    const req = {
+      companyId,
+      email,
+      password,
+      name,
+      number,
+      classification,
+    };
+    if (
+      !formValidater(form, companyId, isEmailValid, isCodeValid, isCodeSended)
+    )
+      return;
+    try {
+      const { status } = await useApi.post("/auth/sign-up", req);
+      if (status === 201) {
+        alert(
+          `환영합니다, ${name}님! 
+          관리자의 인증을 받을 때까지 로그인이 불가하며, 
+          승인허가가 나는 즉시 이메일을 발송해 드리겠습니다.`
+        );
+        nav("/member/signin");
+      }
+    } catch (e: any) {
+      alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+    }
   };
   return (
-    <SignUpForm onSubmit={handleSubmit}>
+    <SignUpForm
+      onSubmit={handleSubmit}
+      isCompanyListModalOpen={isCompanyListModalOpen}
+    >
+      {isCompanyListModalOpen && companyList && (
+        <CompanyListModal
+          companyName={companyName}
+          setCompanyName={setCompanyName}
+          companyList={companyList}
+          setCompanyId={setCompanyId}
+          setIsCompanyListModalOpen={setIsCompanyListModalOpen}
+        />
+      )}
       <Input>
         <input
-          disabled={isEmailValid || isCodeSended}
+          required
+          className="input"
+          type="text"
+          value={companyName}
+          placeholder="Company Name"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setCompanyName(e.target.value);
+          }}
+        />
+        <button
+          className="validate"
+          type="button"
+          onClick={async () => {
+            (await searchCompany(companyName, setCompanyList)) &&
+              setIsCompanyListModalOpen(true);
+          }}
+        >
+          회사검색
+        </button>
+      </Input>
+      <Input>
+        <input
           required
           name="email"
           className="input"
@@ -144,12 +187,15 @@ const SignUp = () => {
         <button
           className="validate"
           type="button"
-          onClick={() => codeSender(email)}
+          onClick={async () => {
+            (await emailValidater(email, setIsCodeSended)) &&
+              setIsCodeInputOpen(true);
+          }}
         >
-          {isEmailValid ? "Verified" : "Send"}
+          {isEmailValid ? "인증완료" : "코드전송"}
         </button>
       </Input>
-      {isCodeSended && ( // 이메일 인증코드 입력창
+      {isCodeInputOpen && (
         <Input>
           <input
             required
@@ -164,13 +210,12 @@ const SignUp = () => {
           <button
             className="validate"
             type="button"
-            onClick={
-              EmailValidater(code)
-                ? () => setIsEmailValid(true)
-                : () => alert("인증코드가 일치하지 않습니다.")
-            }
+            onClick={async () => {
+              (await codeValidater(code, setIsEmailValid, setIsCodeValid)) &&
+                setIsCodeInputOpen(false);
+            }}
           >
-            Verify
+            인증하기
           </button>
         </Input>
       )}

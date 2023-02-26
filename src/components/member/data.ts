@@ -28,27 +28,21 @@ const signupForm = [
   },
   {
     id: 3,
-    name: "companyName",
-    type: "text",
-    placeholder: "Company Name",
-  },
-  {
-    id: 4,
     name: "name",
     type: "text",
     placeholder: "Name",
   },
   {
-    id: 5,
+    id: 4,
     name: "number",
     type: "tel",
-    placeholder: "Phone Number (contain '-')",
+    placeholder: "Phone Number ('-' 제외)",
   },
   {
-    id: 6,
+    id: 5,
     name: "classification",
     type: "select",
-    options: ["발주처", "감리사", "건설사", "설계사", "기타"],
+    options: ["발주처", "감리사", "건설사", "설계사", "관리자", "게스트"],
     placeholder: "Classification",
   },
 ];
