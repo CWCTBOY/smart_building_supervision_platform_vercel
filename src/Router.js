@@ -4,6 +4,10 @@ import SignIn from "./components/auth/signin";
 import SignUp from "./components/auth/signup";
 import GlobalContainer from "./components/global/container";
 import Main from "./pages";
+import AdminCa from "./pages/admin/admin-ca";
+import AdminSa from "./pages/admin/admin-sa";
+import ProjectInfoForm from "./components/common/project/form";
+import Newbie from "./components/admin/ca/newbie";
 
 const Router = () => {
   return (
@@ -13,10 +17,22 @@ const Router = () => {
           <Route path="signin" element={<SignIn />} />
           <Route path="signup" element={<SignUp />} />
         </Route>
-        <Route element={<GlobalContainer />}>
+        {/* static */}
+        <Route path="/" element={<GlobalContainer />}>
           {/* Outlet Position /components/global/container/index.js */}
-          <Route path="project" element={<Main />} />
-          {/* <Route path="project:id" element={<Main />} /> */}
+          <Route path="/" element={<Main />} />
+          <Route path="project">
+            <Route path="add" element={<ProjectInfoForm />} />
+            {/* <Route path=":projectId" /> */}
+          </Route>
+          <Route path="admin">
+            <Route path="service" element={<AdminSa />}>
+              {/* <Route path=":menu" /> */}
+            </Route>
+            <Route path="company" element={<AdminCa />}>
+              <Route path="newbie" element={<Newbie />} />
+            </Route>
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

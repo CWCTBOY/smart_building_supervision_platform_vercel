@@ -8,4 +8,19 @@ const useApi = axios.create({
   },
 });
 
+useApi.interceptors.response.use(
+  (response) => response,
+  ({
+    // error control
+    response: {
+      data: { code, message },
+    },
+  }) => {
+    if (code === -424) {
+      alert(message);
+      window.location.href = "/auth/signin";
+    }
+  }
+);
+
 export default useApi;

@@ -10,9 +10,9 @@ const SignInInput = ({ type, placeholder, name, form, setForm }) => {
           ...form,
           [name]: value,
         });
-        console.log(form);
       }}
       className="loginInput"
+      type={name}
       prefix={
         type === "user" ? (
           <UserOutlined type={type} style={{ color: "rgba(0, 0, 0, 0.25)" }} />
