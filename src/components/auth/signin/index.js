@@ -57,7 +57,7 @@ const bottomBtnList = [
   {
     className: "signup",
     to: "/auth/signup",
-    textValue: "Sign up",
+    textValue: "sign up",
   },
 ];
 

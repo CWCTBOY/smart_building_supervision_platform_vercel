@@ -1,14 +1,12 @@
 import styled from "@emotion/styled";
-import OverviewBox from "../components/common/project/overview/index";
-import ProjectListContainer from "../components/common/project/projectList";
-import { useEffect, useState } from "react";
-import useApi from "../components/hooks/api/axiosInterceptor";
+import OverviewBox from "../components/project/overview";
+import ProjectFrame from "../components/project";
+import ProjectListWrapper from "../components/project";
 
 const MainContainer = styled.div`
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
-  background-color: whitesmoke;
+  background-color: rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: start;
   flex-direction: column;
@@ -18,6 +16,72 @@ const MainContainer = styled.div`
   padding-left: 50px;
   padding-right: 50px;
 `;
+
+const OverviewWrapper = styled.div`
+  width: 100%;
+  height: auto;
+  span {
+    margin-top: 10px;
+    color: black;
+    height: 30px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .boxContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+`;
+
+const overviewList = [
+  {
+    className: "caution",
+    iconName: "caution",
+    boxLabel: "Caution Projects",
+    countColor: "red",
+  },
+  {
+    className: "littlecaution",
+    iconName: "caution",
+    boxLabel: "Little Caution Projects",
+    countColor: "#ffb31a",
+  },
+  {
+    className: "normal",
+    iconName: "normal",
+    boxLabel: "Normal Projects",
+    countColor: "#0052cc",
+  },
+  {
+    className: "healthy",
+    iconName: "healthy",
+    boxLabel: "Healthy Projects",
+    countColor: "#2eb82e",
+  },
+];
+
+// TODO: 프로젝트 리스트 서버에서 받아오기
+const projectList = [
+  {
+    name: "A 프로젝트",
+  },
+  {
+    name: "B  프로젝트",
+  },
+  {
+    name: "C 프로젝트",
+  },
+  {
+    name: "D 프로젝트",
+  },
+  {
+    name: "E 프로젝트",
+  },
+  {
+    name: "F 프로젝트",
+  },
+];
 
 // Main: 프로젝트 리스트 (overview)
 // GlobalContainer: header, sidebar, sessionID에 따라 재로그인 alert
@@ -31,26 +95,25 @@ const MainContainer = styled.div`
 
 const Main = () => {
   // TODO: admin 종류에 따라(id에 따라) 프로젝트 리스트 다르게 하는거
-  const [projectList, setProjectList] = useState();
-  const [params, setParams] = useState({
-    name: null,
-    ctrClass: null,
-    detailCtrClass: null,
-    companyId: null,
-    onlyMine: false,
-  });
-  useEffect(() => {
-    (async () => {
-      const { data } = await useApi.get("/api/project", {
-        params,
-      });
-      setProjectList(data);
-    })();
-  }, [params]);
   return (
     <MainContainer>
-      <OverviewBox />
-      <ProjectListContainer projectList={projectList} />
+      <OverviewWrapper>
+        <span>Overview</span>
+        <hr style={{ marginTop: "10px", marginBottom: "10px" }} />
+        <div className="boxContainer">
+          {overviewList.map(({ className, iconName, boxLabel, countColor }) => (
+            <OverviewBox
+              key={className}
+              className={className}
+              iconName={iconName}
+              boxLabel={boxLabel}
+              countColor={countColor}
+            />
+          ))}
+        </div>
+      </OverviewWrapper>
+      {/* project list map */}
+      <ProjectListWrapper />
     </MainContainer>
   );
 };
