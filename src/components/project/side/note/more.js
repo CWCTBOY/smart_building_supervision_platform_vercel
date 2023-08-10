@@ -122,10 +122,11 @@ const More = ({
   });
   const sendReply = async () => {
     try {
-      await useApi.put("/api/note", form);
+      await useApi.put(`/api/note`, form);
 
       setMore(false);
       setIsScrollBlocked(false);
+      alert("답변이 등록되었습니다.");
     } catch (err) {
       const { code } = err.response.data;
 
